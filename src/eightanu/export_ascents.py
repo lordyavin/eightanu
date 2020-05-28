@@ -14,13 +14,12 @@ eightanu.export_ascents is an exporter that scrap your ascents from the new 8a.n
 @contact:    yavin@gmx.com
 @deffield    updated: Updated
 '''
-
-import sys
-import os
-
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-from urllib3.response import HTTPResponse
+import os
+import sys
+
+from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 
 __all__ = []
@@ -44,17 +43,8 @@ class CLIError(Exception):
 
 
 def export(username):
-    from bs4 import BeautifulSoup    
-    import urllib3
-
     url = "https://www.8a.nu/user/{username}/sportclimbing".format(username=username)    
-        
-    headers = {
-        "Cookie": "_ga=GA1.2.1887139087.1544043139; __gads=ID=aca06ad9ff2a7aa5:T=1544043139:S=ALNI_MYiV0JPpCP9QPJsIi0GuBRQYOu_kA; __unam=613e139-16e125aa445-28740074-2; connect.sid=s%3AVkR8QNfd8z-ui4HIclR0e9xkxytVsbZF.WanzCGaabAsk4k6P2Snm84d7WlRUV%2Btap%2FZEzReQYi8"
-    }
-        
-    from selenium import webdriver
-    from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+       
     driver = webdriver.Firefox()
     driver.get(url)
     filters = driver.find_element_by_class_name("ascent-filters")
