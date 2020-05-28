@@ -1,17 +1,14 @@
-#!/usr/local/bin/python2.7
+#!/usr/local/bin/python3.6
 # encoding: utf-8
 '''
-eightanu.export_ascents -- An exporter of the new 8a.new ascents data.
+eightanu.cli -- The command line interface to export the new 8a.new ascents data.
 
-eightanu.export_ascents is an exporter that scrap your ascents from the new 8a.nu website.
+eightanu.cli is an exporter that scrap your ascents from the new 8a.nu website.
 
 @author:     lordyavin
-
 @copyright:  2020 lordyavin. All rights reserved.
-
 @license:    MIT
-
-@contact:    yavin@gmx.com
+@contact:    github@klesatschke.net
 @deffield    updated: Updated
 '''
 from argparse import ArgumentParser
@@ -19,7 +16,6 @@ from argparse import RawDescriptionHelpFormatter
 import os
 import sys
 
-from selenium.webdriver.remote.webelement import WebElement
 from eightanu import webdriver
 from eightanu.export import export
 
@@ -90,7 +86,7 @@ USAGE
         if verbose > 0:
             print("Verbose mode on")
 
-        export(args.browser, args.username)
+        export(args.browser, args.username, verbose)
         
         return 0
     except KeyboardInterrupt:

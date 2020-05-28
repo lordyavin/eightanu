@@ -1,6 +1,14 @@
 # encoding: utf-8
+'''
+eightanu.webdriver -- Handles the selenium webdrivers.
+
+@author:     lordyavin
+@copyright:  2020 lordyavin. All rights reserved.
+@license:    MIT
+@contact:    github@klesatschke.net
+@deffield    updated: Updated
+'''
 import os
-import sys
 from zipfile import ZipFile
 
 from selenium import webdriver
@@ -30,14 +38,21 @@ DRIVER = {
 }
 
 
-def download(url):
+def download(url, verbose=0):
     http = urllib3.PoolManager()
+    
+    if verbose:
+        print("Downloading %s" % url)
+        
     response = http.request('GET', url)
     assert isinstance(response, HTTPResponse)
     zipfilename = os.path.basename(url)
     
     with open(zipfilename, "wb") as zipfile:
         zipfile.write(response.data)
+    
+    if verbose:
+        print("Extracting %s" % zipfilename)
         
     with ZipFile(zipfilename) as zipfile:
         zipfile.extractall(".")
@@ -45,11 +60,13 @@ def download(url):
     os.remove(zipfilename)
 
 
-def get(browser):
+def get(browser, verbose=0):
     assert browser in SUPPORTED_BROWSER
     try:     
         driver = DRIVER[browser]()
-    except WebDriverException:
-        download(DOWNLOAD[browser])
+    except WebDriverException as e:
+        if verbose:
+            print(e.msg)
+        download(DOWNLOAD[browser], verbose)
         driver = webdriver.Firefox()
     return driver
