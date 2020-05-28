@@ -20,11 +20,11 @@ from eightanu import webdriver
 from eightanu.export import export
 
 __all__ = []
-__version__ = 0.2
+__version__ = 0.1
 __date__ = '2020-05-27'
 __updated__ = '2020-05-28'
 
-DEBUG = 1
+DEBUG = 0
 TESTRUN = 0
 PROFILE = 0
 
