@@ -1,17 +1,14 @@
-#!/usr/local/bin/python2.7
+#!/usr/local/bin/python3.6
 # encoding: utf-8
 '''
-eightanu.export_ascents -- An exporter of the new 8a.new ascents data.
+eightanu.cli -- The command line interface to export the new 8a.new ascents data.
 
-eightanu.export_ascents is an exporter that scrap your ascents from the new 8a.nu website.
+eightanu.cli is an exporter that scrap your ascents from the new 8a.nu website.
 
 @author:     lordyavin
-
 @copyright:  2020 lordyavin. All rights reserved.
-
 @license:    MIT
-
-@contact:    yavin@gmx.com
+@contact:    github@klesatschke.net
 @deffield    updated: Updated
 '''
 from argparse import ArgumentParser
@@ -19,56 +16,34 @@ from argparse import RawDescriptionHelpFormatter
 import os
 import sys
 
-from selenium import webdriver
-from selenium.webdriver.remote.webelement import WebElement
+from eightanu import webdriver
+from eightanu.export import export
 
 __all__ = []
 __version__ = 0.1
 __date__ = '2020-05-27'
-__updated__ = '2020-05-27'
+__updated__ = '2020-05-28'
 
-DEBUG = 1
+DEBUG = 0
 TESTRUN = 0
 PROFILE = 0
 
+
 class CLIError(Exception):
     '''Generic exception to raise and log different fatal errors.'''
+
     def __init__(self, msg):
         super(CLIError).__init__(type(self))
         self.msg = "E: %s" % msg
+
     def __str__(self):
         return self.msg
+
     def __unicode__(self):
         return self.msg
 
 
-def export(username):
-    url = "https://www.8a.nu/user/{username}/sportclimbing".format(username=username)    
-       
-    driver = webdriver.Firefox()
-    driver.get(url)
-    filters = driver.find_element_by_class_name("ascent-filters")
-    assert isinstance(filters, WebElement)
-    all_options  = filters.find_elements_by_tag_name("option")
-    for option in all_options:
-        if option.get_attribute("value") == "0":
-            option.click()
-    
-    table = driver.find_element_by_class_name("user-ascents")
-    assert isinstance(table, WebElement)
-    
-    table_headers = table.find_elements_by_tag_name("th")
-    print( ", ".join([cell.text for cell in table_headers]) )
-    
-    rows = table.find_elements_by_tag_name("tr")
-    for row in rows:
-        cells = row.find_element_by_class_name("td")
-        print( ", ".join([cell.text for cell in cells]) )
-    
-    driver.close()
-    
-
-def main(argv=None): # IGNORE:C0111
+def main(argv=None):  # IGNORE:C0111
     '''Command line options.'''
 
     if argv is None:
@@ -97,10 +72,12 @@ USAGE
 
     try:
         # Setup argument parser
-        parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-u", "--user", dest="username", type=str, help="The 8a user name")
+        parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)        
+        parser.add_argument("-b", "--browser", dest="browser", type=str, choices=webdriver.SUPPORTED_BROWSER, required=True)
         parser.add_argument("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %(default)s]", default=0)
         parser.add_argument('-V', '--version', action='version', version=program_version_message)
+        
+        parser.add_argument("username", type=str, help="Your 8a user name")
 
         # Process arguments
         args = parser.parse_args()
@@ -109,7 +86,8 @@ USAGE
         if verbose > 0:
             print("Verbose mode on")
 
-        export(args.username)
+        export(args.browser, args.username, verbose)
+        
         return 0
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
@@ -121,6 +99,7 @@ USAGE
         sys.stderr.write(program_name + ": " + repr(e) + "\n")
         sys.stderr.write(indent + "  for help use --help")
         return 2
+
 
 if __name__ == "__main__":
     if TESTRUN:
