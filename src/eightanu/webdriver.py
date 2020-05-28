@@ -63,10 +63,11 @@ def download(url, verbose=0):
 def get(browser, verbose=0):
     assert browser in SUPPORTED_BROWSER
     try:     
-        driver = DRIVER[browser]()
+        Driver = DRIVER[browser]
+        driver = Driver()
     except WebDriverException as e:
         if verbose:
             print(e.msg)
         download(DOWNLOAD[browser], verbose)
-        driver = webdriver.Firefox()
+        driver = Driver()
     return driver
