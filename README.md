@@ -5,4 +5,16 @@ Python script to export 8a.nu logbook
 Since the restart of 8a.nu you can no longer export your ascents. This project aims to provide a tool to export personal ascents.
 
 # Usage
-more to come...
+
+```
+cli.py [-h] -b {Firefox,Chrome} [-v] [-V] username
+
+positional arguments:
+  username              Your 8a user name
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -b {Firefox,Chrome}, --browser {Firefox,Chrome}
+  -v, --verbose         set verbosity level [default: 0]
+  -V, --version         show program's version number and exit
+```
