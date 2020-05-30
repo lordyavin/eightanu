@@ -59,7 +59,7 @@ def main(argv=None):  # IGNORE:C0111
     program_license = '''%s
 
   Created by user_name on %s.
-  Copyright 2020 organization_name. All rights reserved.
+  Copyright 2020 lordyavin. All rights reserved.
 
   Licensed under the MIT License
 
