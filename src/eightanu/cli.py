@@ -58,7 +58,7 @@ def main(argv=None):  # IGNORE:C0111
     program_shortdesc = __import__('__main__').__doc__.split("\n")[1]
     program_license = '''%s
 
-  Created by user_name on %s.
+  Created by lordyavin on %s.
   Copyright 2020 lordyavin. All rights reserved.
 
   Licensed under the MIT License
