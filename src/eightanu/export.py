@@ -39,7 +39,7 @@ def _read_table_headers(table):
     
     thead = table.find_element_by_tag_name("thead")
     table_headers = thead.find_elements_by_tag_name("th")[1:] # skip first empty cell
-    headers = ["DATE"] + [cell.text.strip() for cell in table_headers]
+    headers = ["DATE", "STYLE"] + [cell.text.strip() for cell in table_headers]
     return headers
 
 
@@ -54,9 +54,10 @@ def _read_ascents(table, headers):
         date = group.find_element_by_tag_name("th").text
         rows = group.find_elements_by_tag_name("tr")
         for row in rows:
-            cells = row.find_elements_by_tag_name("td")[1:] # skip first empty cell
-            if cells:
-                ascent = [date] + [cell.text.strip() for cell in cells]
+            cells = row.find_elements_by_tag_name("td") # skip first empty cell
+            if len(cells) == len(headers)-1:
+                style = cells[0].find_element_by_tag_name("svg").get_attribute("title")
+                ascent = [date, style] + [cell.text.strip() for cell in cells[1:]]
                 name = ascent[name_idx]
                 if "\n" in name:
                     ascent[name_idx] = name[:name.index("\n")]
