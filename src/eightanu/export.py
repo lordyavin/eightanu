@@ -13,6 +13,9 @@ from eightanu import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver
 from eightanu.webdriver import SUPPORTED_BROWSER
 
+FILLED_STAR_STYLE = "fill: rgb(42, 42, 47);"
+
+
 def _select_alltime_ascents(driver):
     assert isinstance(driver, WebDriver)
     
@@ -23,6 +26,7 @@ def _select_alltime_ascents(driver):
     for option in all_options:
         if option.text == "All Time":
             option.click()
+
 
 def _sort_by_date(driver):
     assert isinstance(driver, WebDriver)
@@ -38,7 +42,7 @@ def _read_table_headers(table):
     assert isinstance(table, WebElement)
     
     thead = table.find_element_by_tag_name("thead")
-    table_headers = thead.find_elements_by_tag_name("th")[1:] # skip first empty cell
+    table_headers = thead.find_elements_by_tag_name("th")[1:]  # skip first empty cell
     headers = ["DATE", "STYLE"] + [cell.text.strip() for cell in table_headers]
     return headers
 
@@ -54,10 +58,17 @@ def _read_ascents(table, headers):
         date = group.find_element_by_tag_name("th").text
         rows = group.find_elements_by_tag_name("tr")
         for row in rows:
-            cells = row.find_elements_by_tag_name("td") # skip first empty cell
-            if len(cells) == len(headers)-1:
+            cells = row.find_elements_by_tag_name("td")  # skip first empty cell
+            if len(cells) == len(headers) - 1:
                 style = cells[0].find_element_by_tag_name("svg").get_attribute("title")
+                stars = cells[-1].find_elements_by_tag_name("svg")
+                rating = 0
+                for star in stars:
+                    if star.get_attribute("style") == FILLED_STAR_STYLE:
+                        rating += 1
+                    
                 ascent = [date, style] + [cell.text.strip() for cell in cells[1:]]
+                ascent[-1] = "%s stars" % rating
                 name = ascent[name_idx]
                 if "\n" in name:
                     ascent[name_idx] = name[:name.index("\n")]
@@ -73,6 +84,7 @@ def _print_logbook(headers, ascents):
     print(";".join(headers))
     for ascent in ascents:
         print(";".join(ascent))
+
 
 def export(browser, username, verbose=0):
     assert browser in SUPPORTED_BROWSER
