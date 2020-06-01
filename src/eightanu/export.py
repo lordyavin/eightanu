@@ -13,6 +13,16 @@ from eightanu import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver
 from eightanu.webdriver import SUPPORTED_BROWSER
 
+FILLED_STAR_STYLE = "fill: rgb(42, 42, 47);"
+
+COLIDX_STYLE = 0
+COLIDX_NAME = 1
+COLIDX_CRAG = 2
+COLIDX_DATE = 3
+COLIDX_NOTES = 4
+COLIDX_RATING = 5
+
+
 def _select_alltime_ascents(driver):
     assert isinstance(driver, WebDriver)
     
@@ -23,6 +33,7 @@ def _select_alltime_ascents(driver):
     for option in all_options:
         if option.text == "All Time":
             option.click()
+
 
 def _sort_by_date(driver):
     assert isinstance(driver, WebDriver)
@@ -38,9 +49,25 @@ def _read_table_headers(table):
     assert isinstance(table, WebElement)
     
     thead = table.find_element_by_tag_name("thead")
-    table_headers = thead.find_elements_by_tag_name("th")[1:] # skip first empty cell
-    headers = ["DATE"] + [cell.text.strip() for cell in table_headers]
+    table_headers = thead.find_elements_by_tag_name("th")[1:]  # skip first empty cell
+    headers = ["DATE", "STYLE"] + [cell.text.strip() for cell in table_headers]
     return headers
+
+
+def _determine_rating(cells):
+    rating = 0
+    stars = cells[COLIDX_RATING].find_elements_by_tag_name("svg")
+    for star in stars:
+        if star.get_attribute("style") == FILLED_STAR_STYLE:
+            rating += 1
+    
+    return rating
+
+
+def _fix_route_name(name):
+    if "\n" in name:
+        return name[:name.index("\n")]
+    return name
 
 
 def _read_ascents(table, headers):
@@ -54,12 +81,17 @@ def _read_ascents(table, headers):
         date = group.find_element_by_tag_name("th").text
         rows = group.find_elements_by_tag_name("tr")
         for row in rows:
-            cells = row.find_elements_by_tag_name("td")[1:] # skip first empty cell
-            if cells:
-                ascent = [date] + [cell.text.strip() for cell in cells]
-                name = ascent[name_idx]
-                if "\n" in name:
-                    ascent[name_idx] = name[:name.index("\n")]
+            cells = row.find_elements_by_tag_name("td")  # skip first empty cell
+            if len(cells) == len(headers) - 1:
+                style = cells[COLIDX_STYLE].find_element_by_tag_name("svg").get_attribute("title")
+                                    
+                ascent = [date, style]
+                ascent += [cell.text.strip() for cell in cells[1:-1]]
+                
+                rating = _determine_rating(cells)               
+                ascent.append("%s stars" % rating)
+                
+                ascent[name_idx] = _fix_route_name(ascent[name_idx])
                 ascents.append(ascent)
     
     return ascents
@@ -72,6 +104,7 @@ def _print_logbook(headers, ascents):
     print(";".join(headers))
     for ascent in ascents:
         print(";".join(ascent))
+
 
 def export(browser, username, verbose=0):
     assert browser in SUPPORTED_BROWSER

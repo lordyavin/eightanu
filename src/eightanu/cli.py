@@ -20,9 +20,9 @@ from eightanu import webdriver
 from eightanu.export import export
 
 __all__ = []
-__version__ = 0.1
+__version__ = 0.2
 __date__ = '2020-05-27'
-__updated__ = '2020-05-28'
+__updated__ = '2020-06-01'
 
 DEBUG = 0
 TESTRUN = 0
@@ -58,11 +58,10 @@ def main(argv=None):  # IGNORE:C0111
     program_shortdesc = __import__('__main__').__doc__.split("\n")[1]
     program_license = '''%s
 
-  Created by user_name on %s.
-  Copyright 2020 organization_name. All rights reserved.
+  Created by lordyavin on %s.
+  Copyright 2020 lordyavin. All rights reserved.
 
-  Licensed under the Apache License 2.0
-  http://www.apache.org/licenses/LICENSE-2.0
+  Licensed under the MIT License
 
   Distributed on an "AS IS" basis without warranties
   or conditions of any kind, either express or implied.
