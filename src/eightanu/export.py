@@ -15,6 +15,13 @@ from eightanu.webdriver import SUPPORTED_BROWSER
 
 FILLED_STAR_STYLE = "fill: rgb(42, 42, 47);"
 
+COLIDX_STYLE = 0
+COLIDX_NAME = 1
+COLIDX_CRAG = 2
+COLIDX_DATE = 3
+COLIDX_NOTES = 4
+COLIDX_RATING = 5
+
 
 def _select_alltime_ascents(driver):
     assert isinstance(driver, WebDriver)
@@ -47,6 +54,22 @@ def _read_table_headers(table):
     return headers
 
 
+def _determine_rating(cells):
+    rating = 0
+    stars = cells[COLIDX_RATING].find_elements_by_tag_name("svg")
+    for star in stars:
+        if star.get_attribute("style") == FILLED_STAR_STYLE:
+            rating += 1
+    
+    return rating
+
+
+def _fix_route_name(name):
+    if "\n" in name:
+        return name[:name.index("\n")]
+    return name
+
+
 def _read_ascents(table, headers):
     assert isinstance(table, WebElement)
     assert isinstance(headers, (list, tuple))
@@ -60,18 +83,15 @@ def _read_ascents(table, headers):
         for row in rows:
             cells = row.find_elements_by_tag_name("td")  # skip first empty cell
             if len(cells) == len(headers) - 1:
-                style = cells[0].find_element_by_tag_name("svg").get_attribute("title")
-                stars = cells[-1].find_elements_by_tag_name("svg")
-                rating = 0
-                for star in stars:
-                    if star.get_attribute("style") == FILLED_STAR_STYLE:
-                        rating += 1
-                    
-                ascent = [date, style] + [cell.text.strip() for cell in cells[1:]]
-                ascent[-1] = "%s stars" % rating
-                name = ascent[name_idx]
-                if "\n" in name:
-                    ascent[name_idx] = name[:name.index("\n")]
+                style = cells[COLIDX_STYLE].find_element_by_tag_name("svg").get_attribute("title")
+                                    
+                ascent = [date, style]
+                ascent += [cell.text.strip() for cell in cells[1:-1]]
+                
+                rating = _determine_rating(cells)               
+                ascent.append("%s stars" % rating)
+                
+                ascent[name_idx] = _fix_route_name(ascent[name_idx])
                 ascents.append(ascent)
     
     return ascents
