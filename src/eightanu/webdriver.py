@@ -23,8 +23,7 @@ FIREFOX = "Firefox"
 CHROME = "Chrome"
 
 SUPPORTED_BROWSER = (
-    FIREFOX,
-    CHROME,
+    FIREFOX
 )
 
 DOWNLOAD = {
