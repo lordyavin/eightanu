@@ -32,7 +32,7 @@ class Ascent8a:
     
     MAX_RATING = 5
 
-    def __init__(self, date, style, route, grade, sector, country, notes, rating):
+    def __init__(self, date, style, route, grade, sector, crag, country, notes, rating):
         """
         @param date: American date
         @param style: The ascent style
@@ -49,6 +49,7 @@ class Ascent8a:
         self.route = Ascent8a._fix_route_name(route)
         self.grade = grade
         self.sector = sector
+        self.crag = crag
         self.country = country
         self.notes = notes
         self.rating = rating
@@ -63,6 +64,7 @@ class Ascent8a:
                                self.route,
                                self.grade,
                                self.sector,
+                               self.crag,
                                self.country,
                                self.notes,
                                self.rating_as_stars()))
@@ -138,7 +140,6 @@ def _determine_country(cells):
         return "unknown-country"
 
 
-
 def _determine_style(cells):
     return cells[COLIDX_STYLE].find_element_by_tag_name("svg").get_attribute("title")
 
@@ -153,6 +154,11 @@ def _get_grade(cells):
 
 def _get_notes(cells):
     return cells[COLIDX_NOTES].text
+
+
+def _get_crag(cells):
+    return cells[COLIDX_CRAG].text
+
 
 def _read_ascents(table, headers):
     assert isinstance(table, WebElement)
@@ -171,6 +177,7 @@ def _read_ascents(table, headers):
                                   route=_get_routename(cells),
                                   grade=_get_grade(cells),
                                   sector=_determine_sector(cells),
+                                  crag=_get_crag(cells),
                                   country=_determine_country(cells),
                                   notes=_get_notes(cells),
                                   rating=_determine_rating(cells))              
@@ -193,7 +200,11 @@ def export(browser, username, verbose=0):
     assert isinstance(verbose, int)    
     
     username = username.replace(" ", "-").lower()
-    url = "https://www.8a.nu/user/{username}/sportclimbing".format(username=username)    
+    url = "https://www.8a.nu/user/{username}/sportclimbing".format(username=username)
+    
+    if verbose:
+        print("Exporting ascents from %s at" % username)
+        print("%s ..." % url)
        
     driver = webdriver.get(browser, verbose)
     try:
