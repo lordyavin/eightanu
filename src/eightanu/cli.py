@@ -18,11 +18,12 @@ import sys
 
 from eightanu import webdriver
 from eightanu.export import export
+from eightanu.webdriver import FIREFOX
 
 __all__ = []
-__version__ = 0.2
+__version__ = 0.3
 __date__ = '2020-05-27'
-__updated__ = '2020-06-01'
+__updated__ = '2020-06-08'
 
 DEBUG = 0
 TESTRUN = 0
@@ -72,8 +73,8 @@ USAGE
     try:
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)        
-        parser.add_argument("-b", "--browser", dest="browser", type=str, choices=webdriver.SUPPORTED_BROWSER, required=True)
-        parser.add_argument("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %(default)s]", default=0)
+        parser.add_argument("-b", "--browser", dest="browser", type=str, choices=webdriver.SUPPORTED_BROWSER, default=FIREFOX, help="The browser to use [default: %(default)s]")
+        parser.add_argument("-v", "--verbose", dest="verbose", action="count", default=0, help="set verbosity level [default: %(default)s]")
         parser.add_argument('-V', '--version', action='version', version=program_version_message)
         
         parser.add_argument("username", type=str, help="Your 8a user name")
